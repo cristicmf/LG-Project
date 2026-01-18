@@ -1,0 +1,23 @@
+# 忽略邮件归档文件
+email_archive/
+
+# 忽略评估结果文件
+evaluation_results/
+
+# 忽略日志文件
+logs/
+
+# 忽略环境变量文件
+.env
+
+# 忽略 Python 缓存文件
+__pycache__/
+*.pyc
+
+# 忽略 IDE 配置文件
+.vscode/
+.idea/
+
+# 忽略操作系统文件
+.DS_Store
+Thumbs.db

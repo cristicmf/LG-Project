@@ -11,6 +11,15 @@ os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
 # 导入配置文件
 from config import SMTP_CONFIG, IMAP_CONFIG, APP_CONFIG
 
+# 导入监控模块
+from monitoring import PerformanceMonitor, log_system_status, get_performance_metrics, get_error_counts, get_function_calls
+
+# 导入日志配置
+from logging_config import get_logger
+
+# 获取日志记录器
+logger = get_logger()
+
 # 直接从环境变量中读取配置（不使用 dotenv 以避免环境问题）
 
 # 尝试导入 OpenAI API
@@ -96,13 +105,16 @@ class EmailAgentState:
 # Step 3: 定义节点函数
 
 # 1. 读取邮件节点
+@PerformanceMonitor("read_email")
 def read_email(state):
     """读取和解析邮件内容"""
     # 在实际应用中，这里会从邮件服务器或 API 读取邮件
     # 这里我们假设邮件内容已经在状态中
+    logger.info("Email content read successfully")
     return state
 
 # 2. 分类意图节点
+@PerformanceMonitor("classify_intent")
 def classify_intent(state):
     """使用 LLM 对邮件进行分类"""
     email_content = state["email_content"]
@@ -153,10 +165,10 @@ def classify_intent(state):
             # 解析 API 响应
             import json
             classification = json.loads(response.choices[0].message.content)
-            print("使用 OpenAI API 完成邮件分类")
+            logger.info("使用 OpenAI API 完成邮件分类")
             
         except Exception as e:
-            print("使用 OpenAI API 分类失败，将使用备选逻辑:", str(e))
+            logger.error("使用 OpenAI API 分类失败，将使用备选逻辑: %s", str(e))
             # 执行备选逻辑
             if "password" in email_content.lower():
                 classification["intent"] = "question"
@@ -487,6 +499,7 @@ EXAMPLE_DOCUMENTS = [
 ]
 
 # 3. 文档搜索节点
+@PerformanceMonitor("search_docs")
 def search_docs(state):
     """搜索相关文档"""
     classification = state["classification"]
@@ -564,9 +577,9 @@ def search_docs(state):
                     search_results.append(hit.entity.get("content"))
             
             if search_results:
-                print("使用 Milvus 向量数据库完成文档搜索")
+                logger.info("使用 Milvus 向量数据库完成文档搜索")
         except Exception as e:
-            print("Milvus 向量数据库搜索失败，将使用基于相似度的搜索:", str(e))
+            logger.error("Milvus 向量数据库搜索失败，将使用基于相似度的搜索: %s", str(e))
             # 继续使用基于相似度的搜索
     
     # 如果向量搜索失败或未启用，使用基于相似度的搜索
@@ -574,9 +587,9 @@ def search_docs(state):
         try:
             # 执行基于相似度的搜索
             search_results = simple_similarity_search(query, EXAMPLE_DOCUMENTS, top_k=3)
-            print("使用基于相似度的搜索完成文档检索")
+            logger.info("使用基于相似度的搜索完成文档检索")
         except Exception as e:
-            print("基于相似度的搜索失败，将使用基于规则的搜索:", str(e))
+            logger.error("基于相似度的搜索失败，将使用基于规则的搜索: %s", str(e))
             # 继续使用基于规则的搜索
     
     # 如果相似度搜索失败，使用基于规则的搜索
@@ -608,6 +621,7 @@ def search_docs(state):
     return new_state
 
 # 4. 起草回复节点
+@PerformanceMonitor("draft_response")
 def draft_response(state):
     """生成适当的回复"""
     classification = state["classification"]
@@ -666,10 +680,10 @@ def draft_response(state):
             
             # 解析 API 响应
             draft = response.choices[0].message.content
-            print("使用 OpenAI API 生成回复")
+            logger.info("使用 OpenAI API 生成回复")
             
         except Exception as e:
-            print("使用 OpenAI API 生成回复失败，将使用备选逻辑:", str(e))
+            logger.error("使用 OpenAI API 生成回复失败，将使用备选逻辑: %s", str(e))
             # 执行备选逻辑
             # 开头
             draft = "Dear Customer,\n\n"
@@ -742,6 +756,7 @@ def draft_response(state):
     return new_state
 
 # 5. 检查是否需要人工审核节点
+@PerformanceMonitor("check_escalation")
 def check_escalation(state):
     """决定是否需要人工审核"""
     classification = state["classification"]
@@ -753,11 +768,14 @@ def check_escalation(state):
     intent = classification["intent"]
     
     if urgency in ["high", "critical"] or intent == "complex":
+        logger.info("邮件需要人工审核: 紧急程度=%s, 意图=%s", urgency, intent)
         return "human_review"
     else:
+        logger.info("邮件不需要人工审核: 紧急程度=%s, 意图=%s", urgency, intent)
         return "send_reply"
 
 # 6. 人工审核节点
+@PerformanceMonitor("human_review")
 def human_review(state):
     """人工审核和处理"""
     # 在实际应用中，这里会将邮件发送给人工代理进行审核
@@ -770,10 +788,13 @@ def human_review(state):
         # 创建新状态并返回
         new_state = state.copy()
         new_state["draft_response"] = reviewed_response
+        logger.info("邮件已通过人工审核并更新")
         return new_state
+    logger.warning("人工审核失败：未找到草稿回复")
     return state
 
 # 7. 发送回复节点
+@PerformanceMonitor("send_reply")
 def send_reply(state):
     """发送回复"""
     # 在实际应用中，这里会通过邮件服务器发送回复
@@ -786,9 +807,11 @@ def send_reply(state):
     # 创建新状态并返回
     new_state = state.copy()
     new_state["messages"] = messages
+    logger.info("回复已发送到: %s", state['sender_email'])
     return new_state
 
 # 8. 真实邮件发送节点
+@PerformanceMonitor("send_real_email")
 def send_real_email(state):
     """使用 SMTP 协议发送真实邮件"""
     import smtplib
@@ -827,16 +850,16 @@ def send_real_email(state):
                 server.send_message(msg)
             
             messages.append(f"Real email sent to {recipient_email}")
-            print(f"Email sent to {recipient_email}")
+            logger.info(f"Email sent to {recipient_email}")
         except Exception as e:
             # 如果实际发送失败，使用模拟发送
             messages.append(f"Real email sent to {recipient_email} (simulated - SMTP connection failed: {str(e)})")
-            print(f"Simulated email sent to {recipient_email} (SMTP connection failed: {str(e)})")
+            logger.warning(f"Simulated email sent to {recipient_email} (SMTP connection failed: {str(e)})")
         
     except Exception as e:
         error_message = f"Failed to send email: {str(e)}"
         messages.append(error_message)
-        print(error_message)
+        logger.error(error_message)
     
     # 创建新状态并返回
     new_state = state.copy()
@@ -844,6 +867,7 @@ def send_real_email(state):
     return new_state
 
 # 9. 邮件接收节点
+@PerformanceMonitor("receive_email")
 def receive_email(state):
     """使用 IMAP 协议接收邮件"""
     import imaplib
@@ -895,17 +919,17 @@ def receive_email(state):
                                 body = msg.get_payload(decode=True).decode()
                             
                             # 处理邮件
-                            print(f"Received email from {from_email} with subject: {subject}")
+                            logger.info(f"Received email from {from_email} with subject: {subject}")
                             messages.append(f"Email received from {from_email} with subject: {subject}")
         except Exception as e:
             # 如果实际接收失败，使用模拟接收
             messages.append(f"Email received from {state['sender_email']} (simulated - IMAP connection failed: {str(e)})")
-            print(f"Simulated email received from {state['sender_email']} (IMAP connection failed: {str(e)})")
+            logger.warning(f"Simulated email received from {state['sender_email']} (IMAP connection failed: {str(e)})")
         
     except Exception as e:
         error_message = f"Failed to receive email: {str(e)}"
         messages.append(error_message)
-        print(error_message)
+        logger.error(error_message)
     
     # 创建新状态并返回
     new_state = state.copy()
@@ -913,6 +937,7 @@ def receive_email(state):
     return new_state
 
 # 10. 邮件归档节点
+@PerformanceMonitor("archive_email")
 def archive_email(state):
     """归档邮件到历史记录"""
     import json
@@ -948,12 +973,12 @@ def archive_email(state):
             json.dump(archive_data, f, ensure_ascii=False, indent=2)
         
         messages.append(f"Email archived: {state['email_id']} - saved to {archive_filename}")
-        print(f"Email archived: {state['email_id']} - saved to {archive_filename}")
+        logger.info(f"Email archived: {state['email_id']} - saved to {archive_filename}")
         
     except Exception as e:
         error_message = f"Failed to archive email: {str(e)}"
         messages.append(error_message)
-        print(error_message)
+        logger.error(error_message)
     
     # 创建新状态并返回
     new_state = state.copy()
@@ -961,6 +986,7 @@ def archive_email(state):
     return new_state
 
 # 11. 客户历史记录查询节点
+@PerformanceMonitor("query_customer_history")
 def query_customer_history(state):
     """查询客户历史记录"""
     # 在实际应用中，这里会从 CRM 系统查询客户历史记录
@@ -978,9 +1004,11 @@ def query_customer_history(state):
     # 创建新状态并返回
     new_state = state.copy()
     new_state["customer_history"] = customer_history
+    logger.info(f"Customer history queried for: {state['sender_email']}")
     return new_state
 
 # 12. 邮件优先级处理节点
+@PerformanceMonitor("process_priority")
 def process_priority(state):
     """处理邮件优先级"""
     classification = state.get("classification", {})
@@ -998,20 +1026,22 @@ def process_priority(state):
     
     # 创建新状态并返回
     new_state = state.copy()
-    if hasattr(new_state, "classification") and new_state.classification:
-        new_state.classification["priority"] = priority
+    if "classification" in new_state and new_state["classification"]:
+        new_state["classification"]["priority"] = priority
     
-    # 获取 messages 属性
-    messages = getattr(new_state, "messages", None)
+    # 获取 messages 键
+    messages = new_state.get("messages", None)
     if messages is None:
         messages = []
     messages.append(f"Priority set to: {priority}")
-    # 设置 messages 属性
-    setattr(new_state, "messages", messages)
+    # 设置 messages 键
+    new_state["messages"] = messages
     
+    logger.info(f"Priority set to: {priority} for email from {state.get('sender_email')}")
     return new_state
 
 # 13. 邮件转发节点
+@PerformanceMonitor("forward_email")
 def forward_email(state):
     """转发邮件到相关部门"""
     classification = state.get("classification", {})
@@ -1034,11 +1064,12 @@ def forward_email(state):
     messages.append(f"Email forwarded to: {target}")
     new_state["messages"] = messages
     
-    print(f"Email forwarded to: {target}")
+    logger.info(f"Email forwarded to: {target}")
     
     return new_state
 
 # 14. 邮件模板选择节点
+@PerformanceMonitor("select_email_template")
 def select_email_template(state):
     """根据邮件类型选择合适的模板"""
     classification = state.get("classification", {})
@@ -1063,6 +1094,7 @@ def select_email_template(state):
     messages.append(f"Email template selected: {intent}")
     new_state["messages"] = messages
     
+    logger.info(f"Email template selected: {intent}")
     return new_state
 
 # Step 4: 连接节点并构建图
@@ -1117,6 +1149,7 @@ class SimpleGraph:
         return current_state
 
 # Step 5: 构建和编译图
+@PerformanceMonitor("build_email_agent")
 def build_email_agent():
     """构建邮件代理图"""
     # 创建图
@@ -1160,7 +1193,9 @@ def build_email_agent():
     graph.set_entry_point("read_email")
     
     # 编译图
-    return graph.compile()
+    compiled_graph = graph.compile()
+    logger.info("Email agent built successfully")
+    return compiled_graph
 
 # Step 6: 测试邮件代理
 if __name__ == "__main__":
