@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>邮件处理代理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">邮件处理代理系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#system-status">系统状态</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#email-submission">邮件提交</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#agent-evaluation">代理评估</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- 系统状态部分 -->
+        <section id="system-status" class="mb-5">
+            <h2 class="mb-4">系统状态</h2>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">系统信息</h5>
+                                    <div id="system-info">加载中...</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">性能指标</h5>
+                                    <div id="performance-metrics">加载中...</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">错误计数</h5>
+                                    <div id="error-counts">加载中...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 邮件提交部分 -->
+        <section id="email-submission" class="mb-5">
+            <h2 class="mb-4">邮件提交</h2>
+            <div class="card">
+                <div class="card-body">
+                    <form id="email-form">
+                        <div class="mb-3">
+                            <label for="sender-email" class="form-label">发件人邮箱</label>
+                            <input type="email" class="form-control" id="sender-email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email-content" class="form-label">邮件内容</label>
+                            <textarea class="form-control" id="email-content" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">提交邮件</button>
+                    </form>
+                    <div id="email-result" class="mt-4"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 代理评估部分 -->
+        <section id="agent-evaluation" class="mb-5">
+            <h2 class="mb-4">代理评估</h2>
+            <div class="card">
+                <div class="card-body">
+                    <button id="evaluate-btn" class="btn btn-success">评估邮件代理</button>
+                    <div id="evaluation-result" class="mt-4"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="bg-dark text-white mt-5 py-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p>&copy; 2026 邮件处理代理系统</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="static/js/main.js"></script>
+</body>
+</html>
