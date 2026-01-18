@@ -1,0 +1,26 @@
+{
+  "email_id": "789",
+  "sender_email": "user4@example.com",
+  "email_content": "你好，我想进行退货，请问需要走什么流程",
+  "classification": {
+    "intent": "question",
+    "urgency": "medium",
+    "topic": "return policy",
+    "summary": "Customer support request",
+    "priority": "high"
+  },
+  "draft_response": "Dear Customer,\n\nThank you for your question. According to our documentation: 退货政策：商品在收到后7天内可以申请退货，需保持商品完好无损，配件齐全 退货流程：1. 登录账户 2. 进入订单页面 3. 选择要退货的商品 4. 填写退货原因 5. 等待审核 6. 邮寄商品 7. 等待退款 退货物流：退货产生的运费由买家承担，除非商品存在质量问题\n\nBest regards,\nCustomer Support Team",
+  "customer_history": {
+    "customer_id": "12345",
+    "name": "John Doe",
+    "email": "user4@example.com",
+    "previous_issues": [
+      "password reset",
+      "technical issue"
+    ],
+    "membership_level": "premium",
+    "last_contact": "2023-07-01",
+    "support_tier": "enterprise"
+  },
+  "archived_at": "2026-01-18T20:03:44.546612"
+}

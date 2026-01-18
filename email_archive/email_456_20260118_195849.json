@@ -1,0 +1,26 @@
+{
+  "email_id": "456",
+  "sender_email": "user2@example.com",
+  "email_content": "The export feature crashes when I select PDF format. Please help!",
+  "classification": {
+    "intent": "bug",
+    "urgency": "high",
+    "topic": "technical issue",
+    "summary": "Customer support request",
+    "priority": "high"
+  },
+  "draft_response": "Dear Customer,\n\nWe're sorry to hear you're experiencing an issue. Please try the following troubleshooting steps: 错误代码参考：504 错误通常表示服务器超时 常见技术问题排查：1. 清除浏览器缓存 2. 尝试使用不同浏览器 3. 检查网络连接 如何更新软件：进入'设置' -> '关于' -> '检查更新' If the issue persists, please reply with more details.\n\nKind regards,\nCustomer Support Team\n\nP.S. This response has been reviewed by a human agent.",
+  "customer_history": {
+    "customer_id": "12345",
+    "name": "John Doe",
+    "email": "user2@example.com",
+    "previous_issues": [
+      "password reset",
+      "technical issue"
+    ],
+    "membership_level": "premium",
+    "last_contact": "2023-07-01",
+    "support_tier": "enterprise"
+  },
+  "archived_at": "2026-01-18T19:58:49.860853"
+}

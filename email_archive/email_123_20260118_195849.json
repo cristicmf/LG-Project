@@ -1,0 +1,26 @@
+{
+  "email_id": "123",
+  "sender_email": "user1@example.com",
+  "email_content": "Hello, I forgot my password and need to reset it. Can you help?",
+  "classification": {
+    "intent": "question",
+    "urgency": "medium",
+    "topic": "password reset",
+    "summary": "Customer support request",
+    "priority": "high"
+  },
+  "draft_response": "Dear Customer,\n\nThank you for your question. According to our documentation: 如何重置密码：1. 访问登录页面 2. 点击'忘记密码' 3. 按照邮件指示操作 密码重置常见问题：密码重置链接有效期为24小时 账户安全提示：定期更换密码，不要与他人共享账户信息\n\nBest regards,\nCustomer Support Team",
+  "customer_history": {
+    "customer_id": "12345",
+    "name": "John Doe",
+    "email": "user1@example.com",
+    "previous_issues": [
+      "password reset",
+      "technical issue"
+    ],
+    "membership_level": "premium",
+    "last_contact": "2023-07-01",
+    "support_tier": "enterprise"
+  },
+  "archived_at": "2026-01-18T19:58:49.768667"
+}

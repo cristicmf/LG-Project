@@ -1,0 +1,26 @@
+{
+  "email_id": "789",
+  "sender_email": "user3@example.com",
+  "email_content": "I was charged twice for my subscription. Please refund the extra amount.",
+  "classification": {
+    "intent": "billing",
+    "urgency": "high",
+    "topic": "billing issue",
+    "summary": "Customer support request",
+    "priority": "high"
+  },
+  "draft_response": "Dear Customer,\n\nThank you for bringing this billing issue to our attention. 退款政策：符合条件的退款将在3-5个工作日内处理 账单问题处理：如果您被重复收费，请联系客服提供交易ID 订阅管理：如何取消自动续费：登录后进入'订阅' -> '管理订阅' -> '取消自动续费' Please provide your transaction ID so we can investigate further.\n\nKind regards,\nCustomer Support Team\n\nP.S. This response has been reviewed by a human agent.",
+  "customer_history": {
+    "customer_id": "12345",
+    "name": "John Doe",
+    "email": "user3@example.com",
+    "previous_issues": [
+      "password reset",
+      "technical issue"
+    ],
+    "membership_level": "premium",
+    "last_contact": "2023-07-01",
+    "support_tier": "enterprise"
+  },
+  "archived_at": "2026-01-18T20:03:14.232061"
+}
