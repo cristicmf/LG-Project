@@ -4,8 +4,10 @@
 
 # Step 1: 导入必要的库和配置
 import os
+from dotenv import load_dotenv
 
-# 直接从环境变量中读取配置（不使用 dotenv 以避免环境问题）
+# 加载环境变量
+load_dotenv()
 
 # 尝试导入 OpenAI API
 openai_available = False
@@ -133,7 +135,7 @@ def classify_intent(state):
             print("使用 OpenAI API 完成邮件分类")
             
         except Exception as e:
-            print("使用 OpenAI API 分类失败，将使用备选逻辑:", str(e))
+            print(f"使用 OpenAI API 分类失败，将使用备选逻辑: {e}")
             # 继续使用备选逻辑
     else:
         # 使用备选逻辑进行分类
@@ -262,7 +264,7 @@ def draft_response(state):
             print("使用 OpenAI API 生成回复")
             
         except Exception as e:
-            print("使用 OpenAI API 生成回复失败，将使用备选逻辑:", str(e))
+            print(f"使用 OpenAI API 生成回复失败，将使用备选逻辑: {e}")
             # 继续使用备选逻辑
     else:
         # 使用备选逻辑生成回复
@@ -340,9 +342,7 @@ def send_reply(state):
     """发送回复"""
     # 在实际应用中，这里会通过邮件服务器发送回复
     # 这里我们只是记录发送状态
-    messages = state.get("messages")
-    if messages is None:
-        messages = []
+    messages = state.get("messages", [])
     messages.append("Reply sent to " + state['sender_email'])
     
     # 创建新状态并返回
