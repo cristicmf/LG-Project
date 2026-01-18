@@ -15,7 +15,37 @@ window.onload = function() {
     document.getElementById('evaluate-btn').addEventListener('click', function() {
         evaluateAgent();
     });
+    
+    // 绑定折叠按钮点击事件，实现图标切换
+    const collapseButtons = document.querySelectorAll('[data-bs-toggle="collapse"]');
+    collapseButtons.forEach(button => {
+        const targetId = button.getAttribute('data-bs-target');
+        const targetElement = document.querySelector(targetId);
+        
+        // 初始化图标状态
+        updateCollapseIcon(button, targetElement);
+        
+        // 绑定点击事件
+        button.addEventListener('click', function() {
+            // 延迟更新图标，确保 Bootstrap 的 collapse 事件已经触发
+            setTimeout(() => {
+                updateCollapseIcon(button, targetElement);
+            }, 300);
+        });
+    });
 };
+
+// 更新折叠图标
+function updateCollapseIcon(button, targetElement) {
+    const iconElement = button.querySelector('.collapse-icon');
+    if (iconElement) {
+        if (targetElement.classList.contains('show')) {
+            iconElement.textContent = '▼'; // 展开状态
+        } else {
+            iconElement.textContent = '▶'; // 折叠状态
+        }
+    }
+}
 
 // 加载系统状态
 function loadSystemStatus() {
@@ -81,12 +111,60 @@ function submitEmail() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            const result = data.result;
             // 显示成功结果
-            emailResult.innerHTML = `
+            let html = `
                 <div class="alert alert-success">邮件处理成功</div>
-                <h5>处理结果:</h5>
-                <pre>${JSON.stringify(data.result, null, 2)}</pre>
             `;
+            
+            // 显示邮件分类结果
+            if (result.classification) {
+                html += `
+                    <h5>邮件分类结果:</h5>
+                    <ul>
+                        <li>意图: ${result.classification.intent}</li>
+                        <li>优先级: ${result.classification.priority}</li>
+                        <li>主题: ${result.classification.subject || '未分类'}</li>
+                    </ul>
+                `;
+            }
+            
+            // 显示模拟回复的邮件信息
+            if (result.draft_response) {
+                html += `
+                    <h5>模拟回复内容:</h5>
+                    <div class="card">
+                        <div class="card-header">
+                            回复邮件
+                        </div>
+                        <div class="card-body">
+                            <pre>${result.draft_response}</pre>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // 显示处理状态
+            if (result.messages) {
+                html += `
+                    <h5>处理状态:</h5>
+                    <ul>
+                `;
+                result.messages.forEach(msg => {
+                    html += `<li>${msg}</li>`;
+                });
+                html += `
+                    </ul>
+                `;
+            }
+            
+            // 显示完整结果（可选）
+            html += `
+                <h5>完整处理结果:</h5>
+                <pre>${JSON.stringify(result, null, 2)}</pre>
+            `;
+            
+            emailResult.innerHTML = html;
         } else {
             // 显示错误信息
             emailResult.innerHTML = `<div class="alert alert-danger">错误: ${data.error}</div>`;
@@ -120,7 +198,7 @@ function evaluateAgent() {
             evaluationResult.innerHTML = `
                 <div class="alert alert-success">评估成功</div>
                 <h5>评估指标:</h5>
-                <pre>${JSON.stringify(data.metrics, null, 2)}</pre>
+                <pre>${JSON.stringify(data.results, null, 2)}</pre>
                 <h5>详细结果:</h5>
                 <pre>${JSON.stringify(data.results, null, 2)}</pre>
             `;

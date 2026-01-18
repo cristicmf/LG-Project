@@ -21,7 +21,7 @@ logger = get_logger()
 from monitoring import PerformanceMonitor
 
 # 导入邮件代理
-from email_agent import build_email_agent
+from src.app.email_agent import EmailAgent
 
 
 class AgentEvaluator:
@@ -32,7 +32,7 @@ class AgentEvaluator:
     
     def __init__(self):
         """初始化评估器"""
-        self.agent = build_email_agent()
+        self.agent = EmailAgent()
         self.evaluation_results = []
         self.evaluation_metrics = {
             "total_requests": 0,
@@ -69,7 +69,8 @@ class AgentEvaluator:
             
             try:
                 # 执行邮件代理
-                result = self.agent.invoke(test_case)
+                email_content = test_case.get("email_content", "")
+                result = self.agent.process_email(email_content)
                 
                 # 记录单个测试用例的执行时间
                 test_response_time = time.time() - test_start_time

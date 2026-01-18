@@ -36,31 +36,38 @@
     <div class="container mt-4">
         <!-- 系统状态部分 -->
         <section id="system-status" class="mb-5">
-            <h2 class="mb-4">系统状态</h2>
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card bg-light">
-                                <div class="card-body">
-                                    <h5 class="card-title">系统信息</h5>
-                                    <div id="system-info">加载中...</div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>系统状态</h2>
+                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#system-status-content" aria-expanded="true" aria-controls="system-status-content">
+                    <span class="collapse-icon">▼</span>
+                </button>
+            </div>
+            <div id="system-status-content" class="collapse show">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">系统信息</h5>
+                                        <div id="system-info">加载中...</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-light">
-                                <div class="card-body">
-                                    <h5 class="card-title">性能指标</h5>
-                                    <div id="performance-metrics">加载中...</div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">性能指标</h5>
+                                        <div id="performance-metrics">加载中...</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-light">
-                                <div class="card-body">
-                                    <h5 class="card-title">错误计数</h5>
-                                    <div id="error-counts">加载中...</div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">错误计数</h5>
+                                        <div id="error-counts">加载中...</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -71,32 +78,46 @@
 
         <!-- 邮件提交部分 -->
         <section id="email-submission" class="mb-5">
-            <h2 class="mb-4">邮件提交</h2>
-            <div class="card">
-                <div class="card-body">
-                    <form id="email-form">
-                        <div class="mb-3">
-                            <label for="sender-email" class="form-label">发件人邮箱</label>
-                            <input type="email" class="form-control" id="sender-email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email-content" class="form-label">邮件内容</label>
-                            <textarea class="form-control" id="email-content" rows="5" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">提交邮件</button>
-                    </form>
-                    <div id="email-result" class="mt-4"></div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>邮件提交</h2>
+                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#email-submission-content" aria-expanded="true" aria-controls="email-submission-content">
+                    <span class="collapse-icon">▼</span>
+                </button>
+            </div>
+            <div id="email-submission-content" class="collapse show">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="email-form">
+                            <div class="mb-3">
+                                <label for="sender-email" class="form-label">发件人邮箱</label>
+                                <input type="email" class="form-control" id="sender-email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email-content" class="form-label">邮件内容</label>
+                                <textarea class="form-control" id="email-content" rows="5" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">提交邮件</button>
+                        </form>
+                        <div id="email-result" class="mt-4"></div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- 代理评估部分 -->
         <section id="agent-evaluation" class="mb-5">
-            <h2 class="mb-4">代理评估</h2>
-            <div class="card">
-                <div class="card-body">
-                    <button id="evaluate-btn" class="btn btn-success">评估邮件代理</button>
-                    <div id="evaluation-result" class="mt-4"></div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>代理评估</h2>
+                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#agent-evaluation-content" aria-expanded="true" aria-controls="agent-evaluation-content">
+                    <span class="collapse-icon">▼</span>
+                </button>
+            </div>
+            <div id="agent-evaluation-content" class="collapse show">
+                <div class="card">
+                    <div class="card-body">
+                        <button id="evaluate-btn" class="btn btn-success">评估邮件代理</button>
+                        <div id="evaluation-result" class="mt-4"></div>
+                    </div>
                 </div>
             </div>
         </section>

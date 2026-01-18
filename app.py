@@ -21,14 +21,14 @@ from monitoring import get_performance_metrics, get_error_counts, get_function_c
 from evaluate_agent import AgentEvaluator, get_sample_test_cases
 
 # 导入邮件代理
-from email_agent import build_email_agent
+from src.app.email_agent import EmailAgent
 
 # 创建 Flask 应用
 app = Flask(__name__)
 CORS(app)
 
 # 创建邮件代理
-email_agent = build_email_agent()
+email_agent = EmailAgent()
 
 # 根路由
 @app.route('/')
@@ -80,7 +80,7 @@ def submit_email():
         }
         
         # 执行邮件代理
-        result = email_agent.invoke(email_request)
+        result = email_agent.process_email(email_content)
         
         return jsonify({"success": True, "result": result})
     except Exception as e:
@@ -98,12 +98,9 @@ def evaluate_agent():
         test_cases = get_sample_test_cases()
         
         # 评估邮件代理
-        metrics = evaluator.evaluate(test_cases, evaluate_accuracy=True)
+        results = evaluator.evaluate(test_cases, evaluate_accuracy=True)
         
-        # 获取评估结果
-        results = evaluator.get_evaluation_results()
-        
-        return jsonify({"success": True, "metrics": metrics, "results": results})
+        return jsonify({"success": True, "results": results})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
