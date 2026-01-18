@@ -17,7 +17,24 @@ try:
         openai_available = True
         print("OpenAI API 已配置，可以使用真实的 LLM 进行邮件分类和回复生成")
     else:
-        print("未设置 OPENAI_API_KEY 环境变量，将使用模拟 LLM")
+        # 尝试从 .env 文件读取 API 密钥
+        try:
+            with open('.env', 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#'):
+                        key, value = line.split('=', 1)
+                        if key.strip() == 'OPENAI_API_KEY' and value.strip():
+                            os.environ["OPENAI_API_KEY"] = value.strip()
+                            client = OpenAI(api_key=value.strip())
+                            openai_available = True
+                            print("从 .env 文件读取到 OpenAI API 密钥，可以使用真实的 LLM 进行邮件分类和回复生成")
+                            break
+        except Exception as e:
+            print("读取 .env 文件失败:", str(e))
+        
+        if not openai_available:
+            print("未设置 OPENAI_API_KEY 环境变量，将使用模拟 LLM")
 except ImportError:
     print("未安装 openai 库，将使用模拟 LLM")
 
@@ -134,10 +151,28 @@ def classify_intent(state):
             
         except Exception as e:
             print("使用 OpenAI API 分类失败，将使用备选逻辑:", str(e))
-            # 继续使用备选逻辑
+            # 执行备选逻辑
+            if "password" in email_content.lower():
+                classification["intent"] = "question"
+                classification["topic"] = "password reset"
+            elif "crash" in email_content.lower() or "error" in email_content.lower():
+                classification["intent"] = "bug"
+                classification["urgency"] = "high"
+                classification["topic"] = "technical issue"
+            elif "charge" in email_content.lower() or "bill" in email_content.lower():
+                classification["intent"] = "billing"
+                classification["urgency"] = "high"
+                classification["topic"] = "billing issue"
+            elif "feature" in email_content.lower() or "add" in email_content.lower():
+                classification["intent"] = "feature"
+                classification["urgency"] = "low"
+                classification["topic"] = "feature request"
+            elif "api" in email_content.lower() or "integration" in email_content.lower():
+                classification["intent"] = "complex"
+                classification["urgency"] = "medium"
+                classification["topic"] = "technical integration"
     else:
         # 使用备选逻辑进行分类
-        # 根据邮件内容进行简单分类
         if "password" in email_content.lower():
             classification["intent"] = "question"
             classification["topic"] = "password reset"
@@ -263,11 +298,42 @@ def draft_response(state):
             
         except Exception as e:
             print("使用 OpenAI API 生成回复失败，将使用备选逻辑:", str(e))
-            # 继续使用备选逻辑
+            # 执行备选逻辑
+            # 开头
+            draft = "Dear Customer,\n\n"
+            
+            # 基于意图的回复
+            if intent == "question":
+                draft += "Thank you for your question. "
+                if search_results:
+                    draft += "According to our documentation: "
+                    draft += " ".join(search_results)
+            elif intent == "bug":
+                draft += "We're sorry to hear you're experiencing an issue. "
+                if search_results:
+                    draft += "Please try the following troubleshooting steps: "
+                    draft += " ".join(search_results)
+                draft += " If the issue persists, please reply with more details."
+            elif intent == "billing":
+                draft += "Thank you for bringing this billing issue to our attention. "
+                if search_results:
+                    draft += " ".join(search_results)
+                draft += " Please provide your transaction ID so we can investigate further."
+            elif intent == "feature":
+                draft += "Thank you for your feature request. "
+                if search_results:
+                    draft += " ".join(search_results)
+                draft += " We appreciate your feedback!"
+            elif intent == "complex":
+                draft += "Thank you for reaching out about this complex issue. "
+                draft += "One of our senior support engineers will contact you shortly to assist with this matter."
+            
+            # 结尾
+            draft += "\n\nBest regards,\nCustomer Support Team"
     else:
         # 使用备选逻辑生成回复
         # 开头
-        draft += "Dear Customer,\n\n"
+        draft = "Dear Customer,\n\n"
         
         # 基于意图的回复
         if intent == "question":
@@ -437,6 +503,17 @@ def build_email_agent():
 
 # Step 6: 测试邮件代理
 if __name__ == "__main__":
+    # 解析命令行参数
+    import sys
+    use_real_llm = False
+    if len(sys.argv) > 1 and sys.argv[1] == "1":
+        use_real_llm = True
+    
+    # 如果不使用真实 LLM，强制设置 openai_available 为 False
+    if not use_real_llm:
+        openai_available = False
+        print("使用虚拟 LLM 运行")
+    
     # 创建邮件代理
     agent = build_email_agent()
     
